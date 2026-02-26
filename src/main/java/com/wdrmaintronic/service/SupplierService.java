@@ -1,32 +1,29 @@
 package com.wdrmaintronic.service;
 
-import com.wdrmaintronic.dto.request.RegisterSupplierRequest;
+import com.wdrmaintronic.dto.request.CreateSupplierRequest;
 import com.wdrmaintronic.model.Supplier;
 import com.wdrmaintronic.repository.SupplierRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SupplierService {
 
-    @Autowired
-    SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
 
-    public ResponseEntity<Supplier> registerSupplier(RegisterSupplierRequest request) {
+    @Transactional
+    public void register(CreateSupplierRequest request) {
 
-        try{
-            Supplier supplier = new Supplier();
-            supplier.setCompanyName(request.getCompanyName());
-            supplier.setCnpj(request.getCnpj());
-            supplierRepository.save(supplier);
-            return new ResponseEntity<>(supplier, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (supplierRepository.existsByCnpj(request.cnpj())) {
+            throw new IllegalArgumentException("CNPJ já cadastrado");
         }
 
-    }
+        Supplier supplier = new Supplier();
+        supplier.setCompanyName(request.companyName());
+        supplier.setCnpj(request.cnpj());
 
+        supplierRepository.save(supplier);
+    }
 }

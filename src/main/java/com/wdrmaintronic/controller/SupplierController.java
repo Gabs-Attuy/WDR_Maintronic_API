@@ -1,25 +1,25 @@
 package com.wdrmaintronic.controller;
 
-import com.wdrmaintronic.dto.request.RegisterSupplierRequest;
+import com.wdrmaintronic.dto.request.CreateSupplierRequest;
 import com.wdrmaintronic.service.SupplierService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin("*")
-@RequestMapping("/api/supplier")
+@RequestMapping("/suppliers")
+@RequiredArgsConstructor
 public class SupplierController {
 
-    @Autowired
-    SupplierService supplierService;
+    private final SupplierService supplierService;
 
-    @PostMapping(path = "/register")
-    public ResponseEntity<?> registerSupplier(RegisterSupplierRequest request) {
-        return supplierService.registerSupplier(request);
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(
+            @RequestBody @Valid CreateSupplierRequest request
+    ) {
+        supplierService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 }
